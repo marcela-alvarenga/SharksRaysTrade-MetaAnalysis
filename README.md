@@ -3,7 +3,5 @@ Pipeline used to collect data from all studies utilizing DNA-tools to analyse th
 
 R scripts use R version 4.3.1 
 
-Contacts:
-data collection - marcela.alvarenga (at) cibio.up.pt 
-data analysis - reis.brito (at) unesp.br
+Contacts: data collection - marcela.alvarenga (at) cibio.up.pt | data analysis - reis.brito (at) unesp.br
 
