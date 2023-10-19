@@ -1,0 +1,1332 @@
+---
+title: "Fifteen years of extensive and inadvertent elasmobranch trade in Brazil detected by DNA tools"
+subtitle: Codes and Plots R Markdown
+author: #author1 #author2
+contact: #email1 #email2
+date: "2023-09-10"
+output: 
+  html_document:
+    theme: journal
+    code_folding: show
+    toc: yes
+    toc_float:
+      collapsed: true
+editor_options: 
+  markdown: 
+    wrap: 80
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Overview
+
+This R Markdown file contains all codes for literature collection and main data analysis performed in the paper “Fifteen years of extensive and inadvertent elasmobranch trade in Brazil detected by DNA tools”. Codes are broken into chunks pertaining each type of analysis and/or plot. Any question regarding the code listed here should be sent to #email1# and #email2#
+
+## Packages and Options
+
+For literature curation, the packages `bibliometrix`, `irr`, and `openxlsx` were utilized. For all the remaining data analysis, `Tidyverse` was the package utilized, with plots being generated via the `ggplot2` package. The packages `ggpubr`, `ggrepel`, and `ggspatial` were used in complement to `ggplot2`.
+
+There are 7 color palettes used for all 6 figures. They are listed in the block below.
+
+```{r packages and palettes, echo=TRUE}
+library(tidyverse)
+library(ggpubr)
+library(ggrepel)
+library(ggspatial)
+
+pal_pink <- c("#C994C8", "#E063AF", "#CD397B")
+pal_reds <- c("#FFFFB2", "#FECC5C", "#FD8D3C", "#E31A1C", "#7f7f7f")
+pal_iucn <- c(
+  "#DB070F", "#D0D0C6", "#FF7A48", "#5FC564", "grey55", "#CEE14A",
+  "#FDE646", "#545454"
+)
+pal_st_chg <- c("#DB070F", "#FF7A48", "#5FC564", "#CEE14A", "#FDE646")
+pal_st_dd <- c("grey55", "#FF7A48", "#5FC564", "#CEE14A", "#FDE646")
+pal_threat <- c(
+  "#DB070F", "#FF7B47", "#FDE744", "#CFE248",
+  "#5EC764", "#D1D1C7", "#545454"
+)
+
+pal_br_threat <- c(
+  "#DB070F", "#FF7B47", "#FDE744", "#FF4416", "#FF972A",
+  "#D1D1C7", "#369584", "#365896", "#343434"
+)
+```
+
+# Data collection and cleaning operations (dataset creation)
+1. Perform extensive search on databases Scopus (https://www.scopus.com/) and Web of Science (https://www.webofscience.com/). You can choose other databases.  
+1.1. Keywords and Boolean operators:
+("mis*label*"  OR  "misidentification"  OR  "molecular tool*"  OR  "genetics tool*"  OR  "DNA tool*"  OR  "DNA barcod*"  OR  "forens* genetic*"  OR  "genetic* forens*"  OR  "molecular identification"  OR  "genetic* identification"  OR  "forens* identification") AND ("elasmobranch*"  OR  "shark*"  OR  "ray*"  OR  "guitar*fish*"  OR "stingray*" OR "skate*" OR "skateray*") AND NOT ("x*ray"      OR  "radiation"  OR  "radiograph*"  OR  "Ray* fluid"  OR  "integrative taxonomy").   
+1.2. You can also add filters if you want, I applied three: (i) research performed in Brazil, (ii) published until 2021 December 31st, and (iii) research paper.  
+1.3. Export your searchers as bibtex (.bib)  
+
+2. Polish your data with Bibliometrix  
+2.1. Import your data  
+
+Import .bib results to Bibliometrix  
+
+```{r data operations 1, eval=FALSE}
+library(bibliometrix)
+file1 <- "WoS.bib"
+W <- convert2df(file1, dbsource = "wos", format = "bibtex")
+head(W["TC"]) #TC is the number of citations
+
+file2 <- "scopus.bib"
+S <- convert2df(file2, dbsource = "scopus", format = "bibtex")
+head(S["TC"])
+
+# Merge results from both searches and remove the duplicate papers
+data <- mergeDbSources(W, S, remove.duplicated = TRUE)
+head(data["TC"]) #check results - head w/ citations number
+View(data) #check results - visualize your data
+dim(data) #check results - dimension of your database
+
+# Export to excel format
+library(openxlsx)
+write.xlsx(data, file = 'data.xlsx')
+```
+
+This excel file contains all the papers retrieved from Scopus and Web of Science. You can proceed for the next step, or you can search for additional data on Scholar and manually add to this spreadsheet (recommended).
+I added the first 50 hits of the Scholar search with the following Boolean operators: 
+Brazil (shark OR ray OR guitarfish OR stingray OR skate) AND mislabel* OR forensic OR genetics OR "molecular identification"
+
+2.2 Clean your data 
+Check data file and inspect abstracts to make sure if all papers retrieved are in the context of your analysis. It is also important to look to the complete record in this step. To ensure reliability of data collection, it is important that more than one author participate in the process of data cleaning. Here, three authors participated. Each author check the spreadhseet alone and we just merged the data earlier, as you can check in this excel file (data-WS-curation-IB_MA_VP). From this file, we created a matrix marking the acceptance and rejection of each paper by each author (MatrixIRR.xlsx).
+
+2.3. Calculate the Inter Rater Agreement
+
+The matrix created in the previous step will be used to calculate the Fleiss’s Kappas Index Fleiss Kappas Index is an index of interrater agreement between m raters on categorical data, where a reliable data collection has a kappa index > 0.8
+
+- IRR for the boolean search on both Scopus and Web of Science
+
+```{r data operations 2, echo=TRUE}
+library(irr)
+matrix_ws <- readxl::read_xlsx("../data/MatrixIRR.xlsx", sheet="wosco", col_names = TRUE)
+str(matrix_ws)
+
+#The null hypothesis Kappa=0
+kappam.fleiss(matrix_ws)
+kappam.fleiss(matrix_ws, exact = TRUE)
+kappam.fleiss(matrix_ws, detail = TRUE)
+```
+
+Kappa = 0.871
+
+- IRR for the search on Scholar
+
+```{r data operations 3, echo=TRUE}
+library(irr)
+matrix_s<-readxl::read_xlsx("../data/MatrixIRR.xlsx", sheet="scholar", col_names = TRUE)
+str(matrix_s)
+
+#The null hypothesis Kappa=0
+kappam.fleiss(matrix_s)
+kappam.fleiss(matrix_s, exact = TRUE)
+kappam.fleiss(matrix_s, detail = TRUE)
+```
+
+Kappa = 0.916
+
+- IRR for the searches in all databases (combining Scopus + Web of Science + Scholar)
+
+```{r data operations 4, echo=TRUE}
+library(irr)
+matrix_t<-readxl::read_xlsx("../data/MatrixIRR.xlsx", sheet="all", col_names = TRUE)
+str(matrix_t)
+
+#The null hypothesis Kappa=0
+kappam.fleiss(matrix_t)
+kappam.fleiss(matrix_t, exact = TRUE)
+kappam.fleiss(matrix_t, detail = TRUE)
+```
+
+Kappa = 0.903
+
+# Data Cleaning Routines (main datasets)
+
+Typical data cleaning routines were applied to the main datasets: `01a_raw_data`
+and `01b_raw_mt_data`. Cases were changed to lower when needed, special
+characters used in column names changed to underscore, and species names were
+separated by single space instead of underscore.
+
+```{r data cleaning, echo=TRUE, warning=FALSE}
+# Load datasets
+raw_data <- readxl::read_xlsx("../data/01a_raw_data.xlsx", sheet = "Trade_Analysis")
+raw_mt_data <- readxl::read_xlsx("../data/01b_raw_mt_data.xlsx", sheet = 3)
+
+## Change case to lower
+raw_data <- raw_data %>% rename_all(., .funs = tolower) # column names
+
+raw_data <- raw_data %>%
+  mutate(state = case_when(
+    state == "AMAPÁ" ~ "Amapá", # change specific values
+    state == "PARÁ" ~ "Pará",
+    TRUE ~ state
+  ))
+
+raw_mt_data <- raw_mt_data %>% rename_all(., .funs = tolower)
+
+## Change dots/spaces for underscore (column names)
+raw_mt_data <- raw_mt_data %>% rename_all(~ str_replace_all(., " ", "_"))
+
+## Remove underscore from data
+raw_data <- raw_data %>%
+  mutate_all(~ str_replace_all(., "_", " "))
+
+raw_mt_data <- raw_mt_data %>%
+  mutate_all(~ str_replace_all(., "_", " "))
+
+# Export clean datasets
+write.csv(raw_data, "../data/02a_clean_data.csv", row.names = FALSE)
+write.csv(raw_mt_data, "../data/02b_clean_mt_data.csv", row.names = FALSE)
+```
+
+# Data Analysis
+
+Standard frequency statistics (e.g. counts, percentages) were applied to
+different datasets produced at the end of the cleaning process.
+
+```{r data analysis, echo=TRUE, warning=FALSE}
+# Load clean datasets
+clean_data <- read.csv("../data/02a_clean_data.csv")
+clean_mt_data <- read.csv("../data/02b_clean_mt_data.csv")
+clean_mol_data <- read.csv("../data/02c_clean_gen_data.csv")
+
+## Simple counts
+by_year <- clean_data %>%
+  group_by(year = publication_date) %>%
+  summarise(paper_count = n_distinct(paper)) %>%
+  drop_na()
+
+by_state <- clean_data %>%
+  group_by(state = state) %>%
+  summarise(sample_count = n()) %>%
+  arrange(desc(sample_count))
+
+## Filter uncertain data
+filter_rows <- c(3, 8, 10, 13, 14) # rows with uncertain values
+
+by_state <- by_state %>%
+  filter(!row_number() %in% filter_rows) %>%
+  mutate(sample_count = case_when(
+    sample_count == 1012 ~ 1022,
+    TRUE ~ sample_count
+  )) %>%
+  arrange(desc(sample_count))
+
+## Create abbreviation and region columns
+by_state <- by_state %>%
+  mutate(
+    abbrev = c(
+      "PA", "SP", "RN", "PR", "RJ", "SC", "RS",
+      "AP", "BA", "SE", "CE", "PE", "AL", "ES", "MA"
+    ),
+    region = c(
+      "North", "Southeast", "North", "South", "Southeast",
+      "South", "South", "North", "Northeast", "Northeast",
+      "Northeast", "Northeast", "Northeast", "Southeast",
+      "Northeast"
+    )
+  ) %>%
+  relocate(c(abbrev, region), .before = sample_count)
+
+# Count papers by state
+
+## Define states and abbreviation vectors
+states <- c(
+  "Pará", "São Paulo", "Rio Grande do Norte", "Paraná", "Rio de Janeiro",
+  "Santa Catarina", "Rio Grande do Sul", "Amapá", "Bahia",
+  "Sergipe", "Ceará", "Pernambuco", "Alagoas", "Espirito Santo", "Maranhão"
+)
+
+abbrev <- c(
+  "PA", "SP", "RN", "PR", "RJ", "SC", "RS", "AP", "BA", "SE",
+  "CE", "PE", "AL", "ES", "MA"
+)
+
+## Filter data and count papers by state
+papers_by_state <- clean_data %>%
+  filter(state %in% states) %>%
+  select(paper, state, region) %>%
+  distinct() %>%
+  group_by(state, region) %>%
+  summarize(paper_count = n()) %>%
+  arrange(desc(paper_count)) %>%
+  mutate(abbrev = abbrev[match(state, states)], .before = region)
+
+# Export new datasets
+write.csv(by_year, "../data/03a_papers_by_year.csv", row.names = FALSE)
+write.csv(by_state, "../data/04_samples_by_state.csv", row.names = FALSE)
+write.csv(papers_by_state, "../data/05_papers_by_state.csv", row.names = FALSE)
+```
+
+Since the meat trade is an important part of the discussion of the paper,
+analysis regarding this topic were conducted in separate from the main data.
+
+```{r meat trade analysis, echo=TRUE, warning=FALSE}
+# Paper classification
+
+## Define paper class vector
+p_class <- c("Methodology", "Trade analysis", "Methodology/Trade analysis")
+
+## Filter data and count paper classes by year
+classes_by_year <- clean_mt_data %>%
+  filter(paper_category %in% p_class) %>%
+  select(title, year, paper_category) %>%
+  distinct() %>%
+  group_by(year, paper_category) %>%
+  summarize(paper_count = n())
+
+## Calculate percents by paper type
+percents <- clean_mt_data %>%
+  group_by(paper_category) %>%
+  summarise(paper_count = n()) %>%
+  mutate(type_percent = round(paper_count / sum(paper_count) * 100, digits = 1))
+
+# Export new datasets
+write.csv(classes_by_year, "../data/03b_paper_class_by_year.csv", row.names = FALSE)
+write.csv(percents, "../data/06_paper_class_percent.csv", row.names = FALSE)
+```
+
+The same principle was applied to analyse and quantify the genetic tools used to
+identify species presented in the papers retrieved.
+
+```{r genetic analysis, echo=TRUE, warning=FALSE}
+# DNA techniques
+dna_data <- clean_data %>%
+  select(publication_date, paper, dna_technique) %>%
+  distinct() %>%
+  drop_na()
+
+## Define DNA techniques vector
+dna_tech <- c("DNA sequencing", "PCR Multiplex", "PCR RFLP")
+
+## Filter data and count DNA techniques by year
+tech_by_year <- dna_data %>%
+  filter(dna_technique %in% dna_tech) %>%
+  select(paper, publication_date, dna_technique) %>%
+  distinct() %>%
+  group_by(publication_date, dna_technique) %>%
+  summarize(tech_count = n())
+
+# Export dataset
+write.csv(tech_by_year, "../data/07_techs_by_year.csv", row.names = FALSE)
+```
+
+Shark and Ray datasets were analysed in separate. Molecular data (i.e. types of
+markers presented by the papers) used to identify each species were quantified
+and analysed.
+
+```{r shark and ray, echo=TRUE, warning=FALSE}
+# Molecular Data
+
+## Isolate shark and ray data
+shark_data <- clean_mol_data %>%
+  filter(classification %in% "shark") %>%
+  select(
+    species, genbank_total, marker_coi, marker_cytb, marker_12s, marker_16s,
+    marker_nadh2, marker_its2, marker_mitogenome, marker_bold_coi
+  ) %>%
+  mutate_all(~ replace_na(., 0))
+
+ray_data <- clean_mol_data %>%
+  filter(classification %in% "ray") %>%
+  select(
+    species, genbank_total, marker_coi, marker_cytb, marker_12s, marker_16s,
+    marker_nadh2, marker_its2, marker_mitogenome, marker_bold_coi
+  ) %>%
+  mutate_all(~ replace_na(., 0))
+
+## Define molecular markers vector
+markers <- grep("marker", colnames(shark_data), value = TRUE)
+
+## Calculate percentage of species with sequences for each marker
+shark_mk_percent <- round(colSums(shark_data[markers] > 0) / nrow(shark_data) * 100, 1)
+ray_mk_percent <- round(colSums(ray_data[markers] > 0) / nrow(ray_data) * 100, 1)
+
+## Combine data into a single dataframe
+marker_percent <- data.frame(
+  marker = markers,
+  shark = shark_mk_percent,
+  ray = ray_mk_percent
+)
+
+marker_percent <- marker_percent %>% # long format
+  pivot_longer(
+    cols = c("shark", "ray"),
+    names_to = "species",
+    values_to = "percent"
+  )
+
+# Export dataset
+write.csv(marker_percent, "../data/08_marker_percent.csv", row.names = FALSE)
+```
+
+# Figure 1
+
+Figure 1 is based on the dataset `02b_clean_mt_data` which contains data
+relevant to the meat trade analysis. Data was summarised to obtain:
+
+-   the **number of papers** for the 2008-2021 period, **based on paper
+    classification**.\
+-   the **frequency** of each paper category.
+
+```{r fig1 data, echo=TRUE}
+# Load dataset
+clean_mt_data <- read.csv("../data/02b_clean_mt_data.csv")
+```
+
+```{r fig1 summarise data, echo=TRUE}
+# Summarise
+ptypes_by_year <- clean_mt_data %>%
+  group_by(year = year, paper_class = paper_category) %>%
+  summarise(paper_count = n_distinct(title)) %>%
+  drop_na()
+
+ptypes_percent <- clean_mt_data %>%
+  group_by(paper_category) %>%
+  summarise(paper_count = n()) %>%
+  mutate(
+    percent = round(paper_count / 35 * 100, digits = 1),
+    lab_pos = cumsum(percent) - .5 * percent
+  ) %>%
+  arrange(desc(percent))
+```
+
+The two plots from Figure 1 are then created separately:
+
+```{r fig1 grouped bar plot, echo=TRUE}
+# Grouped bars plot
+ptypes_bars <- ptypes_by_year %>%
+  ggplot(aes(fill = paper_class, y = paper_count, x = year)) +
+  geom_bar(position = "stack", stat = "identity") +
+  scale_x_continuous(
+    limits = c(2007, 2022),
+    breaks = seq(2008, 2021, by = 1),
+    expand = c(0, 0)
+  ) +
+  scale_y_continuous(
+    limits = c(0, 10),
+    breaks = seq(0, 10, by = 2),
+    expand = c(0, 0)
+  ) +
+  scale_fill_discrete(type = pal_pink) +
+  labs(x = "\nYear", y = "Number of papers\n") +
+  theme_minimal() +
+  theme(
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(),
+    axis.line = element_line(color = "black"),
+    axis.ticks = element_line(color = "black"),
+    axis.title = element_text(face = "bold", size = 18, family = "Times New Roman"),
+    axis.text = element_text(size = 13, family = "Times New Roman", color = "black"),
+    legend.position = "none",
+    plot.margin = margin(0.5, 0.5, 0.5, 0.5, unit = "cm")
+  )
+```
+
+```{r fig1 donut plot, echo=TRUE}
+# Donut plot
+
+## Adjust donut label position
+ptypes_percent <- ptypes_percent %>%
+  mutate(
+    lab_pos = replace(lab_pos, lab_pos == 65.8, 33.5),
+    lab_pos = replace(lab_pos, lab_pos == 11.45, 87.5),
+    lab_pos = replace(lab_pos, lab_pos == 27.2, 73.5)
+  )
+
+# Create plot
+ptypes_donut <- ggplot(
+  ptypes_percent, aes(x = 2, percent, fill = paper_category)
+) +
+  geom_bar(stat = "identity") +
+  geom_label_repel(
+    aes(
+      y = lab_pos,
+      label = paste(percent, "%", sep = "")
+    ),
+    min.segment.length = 0,
+    direction = "both",
+    nudge_x = 0.5,
+    nudge_y = 1,
+    size = 5,
+    family = "Times New Roman",
+    fontface = "bold",
+    show.legend = FALSE
+  ) +
+  coord_polar("y", start = 700) +
+  xlim(.2, 2.5) +
+  scale_fill_discrete(type = pal_pink) +
+  labs(fill = "  Paper \nCategory") +
+  guides(fill = guide_legend(nrow = 3, byrow = TRUE)) +
+  theme_minimal() +
+  theme(
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(),
+    axis.line = element_blank(),
+    axis.ticks = element_blank(),
+    axis.title = element_blank(),
+    axis.text = element_blank(),
+    legend.title = element_text(face = "bold", size = 14, family = "Times New Roman"),
+    legend.text = element_text(size = 14, family = "Times New Roman"),
+    legend.position = "bottom"
+  )
+```
+
+Then Figure 1 composition is created:
+
+```{r fig1 first part, echo=TRUE, warning=FALSE, fig.width=15, fig.height=7}
+ptypes_comp <- ggarrange(ptypes_bars, ptypes_donut,
+  ncol = 2, labels = c("A", "B"),
+  font.label = list(size = 18, family = "Times New Roman"),
+  widths = c(2, 1)
+)
+
+plot(ptypes_comp)
+```
+
+# Figure 2
+
+In Figure 2, **Plot A** is a representation of Brazilian states, derived from
+`geobr` package. **Plot B** and **Plot C** are created from the datasets
+`04_samples_by_state` and `05_papers_by_state`, respectively.
+
+```{r fig2 data, echo=TRUE}
+# Load datasets
+state_samples <- read.csv("../data/04_samples_by_state.csv")
+state_papers <- read.csv("../data/05_papers_by_state.csv")
+```
+
+The first plot in Figure 2 is the states map of Brazil:
+
+```{r fig2 states map plot, echo=TRUE, warning=FALSE}
+# Create new dataframe for the map
+br <- geobr::read_state(
+  year = 2020,
+  showProgress = FALSE
+)
+
+states_df <- state_samples
+states_df <- br %>%
+  left_join(states_df, by = c("name_state" = "state"))
+
+# Map plot
+state_map <- ggplot(
+  states_df, aes(fill = sample_count)
+) +
+  geom_sf(lwd = 0.1, color = "black") +
+  geom_sf_text(aes(label = abbrev),
+    size = 3, fontface = "bold", family = "Times New Roman",
+    fun.geometry = sf::st_centroid
+  ) +
+  scale_fill_gradient(
+    low = "#E31A1C",
+    high = "#FFFFB2",
+    name = "Total count",
+    na.value = "grey85"
+  ) +
+  coord_sf() +
+  annotation_scale(
+    height = unit(0.25, "cm"),
+    style = "ticks"
+  ) +
+  annotation_north_arrow(
+    location = "bl", which_north = "true",
+    pad_x = unit(0.7, "cm"),
+    pad_y = unit(1, "cm"),
+    style = north_arrow_minimal(),
+    height = unit(1, "cm"),
+    width = unit(1, "cm")
+  ) +
+  labs(x = "Longitude", y = "Latitude") +
+  theme_minimal() +
+  theme(
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(),
+    legend.position = "none",
+    axis.title = element_blank(),
+    axis.text = element_blank(),
+    plot.margin = margin(0.5, 0, 0.5, 0, "cm")
+  )
+```
+
+To create **barplots in B and C**, the **x axis** is then standardized:
+
+```{r x axis standardization, echo=TRUE}
+x_limits <- c(
+  "PA", "SP", "RN", "PR", "RJ", "SC", "RS", "AP", "BA", "SE", "CE",
+  "PE", "AL", "ES", "MA"
+)
+```
+
+And then plots are drawn based on 1) the number of samples per state and 2) the
+number of papers by state:
+
+```{r fig2 single barplots, echo=TRUE}
+# Samples by state
+state_samples_plot <- state_samples %>%
+  mutate(abbrev = fct_reorder(abbrev, sample_count, .desc = TRUE)) %>%
+  ggplot(aes(abbrev, sample_count)) +
+  geom_bar(stat = "identity", aes(fill = sample_count)) +
+  geom_text(aes(label = sample_count),
+    vjust = -0.2,
+    size = 4,
+    family = "Times New Roman",
+    fontface = "bold"
+  ) +
+  scale_fill_gradient(low = "#E31A1C", high = "#FFFFB2", name = "Total count") +
+  scale_y_continuous(
+    limits = c(0, 1200),
+    breaks = seq(0, 1200, by = 200),
+    expand = c(0, 0)
+  ) +
+  labs(x = "\nBrazilian State", y = "Number of Samples\n") +
+  theme_minimal() +
+  theme(
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(),
+    legend.position = "none",
+    axis.line = element_line(color = "black"),
+    axis.ticks = element_line(color = "black"),
+    axis.title = element_text(face = "bold", size = 16),
+    axis.text.x = element_text(size = 12, color = "black"),
+    axis.text.y = element_text(size = 14, color = "black"),
+    text = element_text(family = "Times New Roman"),
+    plot.margin = margin(0.5, 0, 0.5, 0, "cm")
+  )
+
+# Papers by state
+state_papers_plot <- state_papers %>%
+  mutate(abbrev = fct_reorder(abbrev, paper_count, .desc = TRUE)) %>%
+  ggplot(aes(abbrev, paper_count)) +
+  geom_bar(stat = "identity", aes(fill = paper_count)) +
+  geom_text(aes(label = paper_count),
+    vjust = -0.2,
+    size = 4,
+    family = "Times New Roman",
+    fontface = "bold"
+  ) +
+  scale_fill_gradient(low = "#E31A1C", high = "#FFFFB2", name = "Total count") +
+  scale_x_discrete(limits = x_limits) +
+  scale_y_continuous(
+    limits = c(0, 12),
+    breaks = seq(0, 12, by = 2),
+    expand = c(0, 0)
+  ) +
+  labs(x = "\nBrazilian State", y = "Number of Papers\n") +
+  theme_minimal() +
+  theme(
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(),
+    legend.position = "none",
+    axis.line = element_line(color = "black"),
+    axis.ticks = element_line(color = "black"),
+    axis.title = element_text(face = "bold", size = 16),
+    axis.text.x = element_text(size = 12, color = "black"),
+    axis.text.y = element_text(size = 14, color = "black"),
+    text = element_text(family = "Times New Roman"),
+    plot.margin = margin(0.5, 0, 0.5, 0, "cm")
+  )
+```
+
+Finally, Figure 2 complete composition is achieved:
+
+```{r fig2 full composition, echo=TRUE, warning=FALSE, fig.width=15, fig.height=7}
+map_comp <- ggarrange(state_map, state_samples_plot, state_papers_plot,
+  ncol = 3,
+  widths = c(1, 1, 1), labels = c("A", "B", "C"),
+  font.label = list(size = 18, family = "Times New Roman")
+)
+
+plot(map_comp)
+```
+
+# Figure 3
+
+Figure 3 is based on the datasets `02c_clean_gen_data.csv`, `07_techs_by_year`,
+and `08c_marker_data.csv`. It groups the different types of technologies used
+over the years on **Plot A**; **Plot B** represents, respectively, shark and ray
+data grouped by the type of marker used to identify species in both groups; the
+number of species identified is shown inside the bars. Finally, **Plot C** and
+**Plot D**
+
+```{r fig3 data, echo=TRUE}
+techs_by_year <- read.csv("../data/07_techs_by_year.csv")
+marker_data <- read.csv("../data/08c_marker_data.csv")
+mol_data <- read.csv("../data/02c_clean_gen_data.csv")
+```
+
+The four plots of Figure 3 are drawn separated:
+
+```{r fig3 grouped bars plot, echo=TRUE}
+# Grouped bars plot
+tech_types_plot <- techs_by_year %>%
+  ggplot(aes(factor(publication_date), tech_count, fill = dna_technique)) +
+  geom_bar(stat = "identity", position = "fill") +
+  scale_y_continuous(labels = scales::percent, expand = c(0, 0)) +
+  scale_fill_discrete(type = pal_pink) +
+  labs(
+    fill = "Technique",
+    x = "\nPublication Date", y = "Percentage\n"
+  ) +
+  theme_minimal() +
+  theme(
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(),
+    axis.line = element_line(color = "black"),
+    axis.ticks = element_line(color = "black"),
+    axis.title = element_text(face = "bold", size = 18, family = "Times New Roman"),
+    axis.text = element_text(size = 16, family = "Times New Roman", color = "black"),
+    legend.title = element_text(face = "bold", size = 14, family = "Times New Roman"),
+    legend.text = element_text(size = 14, family = "Times New Roman"),
+    legend.position = "right",
+    plot.margin = margin(0.5, 0, 0.5, 0.5, "cm")
+  )
+```
+
+```{r fig3 single bars plot, echo=TRUE}
+# Single bars plot
+shark_plot <- ggplot(data = marker_data, aes(reorder(marker, percent), -percent, fill = species)) +
+  geom_col(data = subset(marker_data, species == "shark"), position = "identity") +
+  geom_text(
+    data = subset(marker_data, species == "shark"), aes(label = sp_count),
+    vjust = 0.5, hjust = -0.5, size = 3
+  ) +
+  scale_x_discrete(position = "top") +
+  scale_y_continuous(labels = function(x) scales::percent(abs(x), scale = 1), expand = c(0, 3)) +
+  scale_fill_manual(values = "grey55") +
+  coord_flip() +
+  labs(x = NULL, y = "\nPercent") +
+  theme_minimal() +
+  theme(
+    axis.title = element_text(face = "bold", size = 18, family = "Times New Roman", color = "black"),
+    axis.text.y = element_blank(),
+    axis.text.x = element_text(size = 14, family = "Times New Roman", color = "black"),
+    axis.line.x = element_line(color = "black"),
+    axis.ticks.x = element_line(color = "black"),
+    legend.position = "none"
+  )
+
+## Define y axis limits
+y_limits <- c("Mitochondrial Genome", "ITS2", "CytB", "12S", "16S", "ND2", "COI", "COI (BOLD)")
+
+plot_labels <- ggplot(data = marker_data, aes(reorder(marker, percent), -percent, fill = species)) +
+  geom_col(
+    data = subset(marker_data, species == "shark"),
+    aes(reorder(marker, percent), 0, fill = alpha("white", 0)),
+    position = "identity"
+  ) +
+  geom_text(aes(y = 0, label = as.character(marker)), size = 3.5) +
+  scale_x_discrete(limits = y_limits) +
+  coord_flip() +
+  labs(x = NULL, y = NULL) +
+  theme_minimal() +
+  theme(
+    legend.position = "none",
+    axis.text = element_blank(),
+    axis.ticks = element_blank(),
+    panel.grid = element_blank(),
+    # plot.margin = margin(0.25, 0, 1.07, 0, "cm")
+    plot.margin = margin(0.15, 0.5, 1.7, 0.5, "cm")
+  )
+
+ray_plot <- ggplot(data = marker_data, aes(reorder(marker, percent), -percent, fill = species)) +
+  geom_col(data = subset(marker_data, species == "ray"), position = "identity") +
+  geom_text(
+    data = subset(marker_data, species == "ray"), aes(label = sp_count),
+    vjust = 0.5, hjust = 1.5, size = 2.75
+  ) +
+  scale_x_discrete(position = "top") +
+  scale_y_continuous(
+    labels = function(x) scales::percent(abs(x), scale = 1), expand = c(0, 3),
+    trans = "reverse"
+  ) +
+  scale_fill_manual(values = "grey55") +
+  coord_flip() +
+  labs(x = NULL, y = "\nPercent") +
+  theme_minimal() +
+  theme(
+    axis.title = element_text(face = "bold", size = 18, family = "Times New Roman", color = "black"),
+    axis.text.y = element_blank(),
+    axis.text.x = element_text(size = 14, family = "Times New Roman", color = "black"),
+    legend.position = "none",
+    axis.line.x = element_line(color = "black"),
+    axis.ticks.x = element_line(color = "black")
+  )
+
+# Create composite plot
+markers_plot <- ggarrange(shark_plot, plot_labels, ray_plot,
+  ncol = 3,
+  widths = c(1, 0.35, 1)
+)
+```
+
+```{r fig3 donut plot, echo=TRUE}
+# Donut plot
+# Define marker vector names
+marker_columns <- c("marker_coi", "marker_cytb", "marker_12s", "marker_16s", "marker_nadh2", "marker_its2", "marker_mitogenome", "marker_bold_coi")
+
+# Filter the dataset
+mol_data_filter <- mol_data %>%
+  slice(-c(46, 49, 51, 64)) %>%
+  mutate(across(all_of(marker_columns), ~ replace_na(., 0))) %>%
+  mutate(
+    geo_distribution = str_replace(geo_distribution, "endemic", "Brazil"),
+    geo_distribution = str_replace(geo_distribution, "wide-range", "Wide range")
+  ) %>%
+  filter(geo_distribution %in% c("Brazil", "Wide range"))
+
+# Extract counts and percentages
+mol_data_filter <- mol_data_filter %>%
+  group_by(geo_distribution) %>%
+  summarise(across(all_of(marker_columns), ~ sum(.x > 0 & !is.na(.x))))
+
+mol_data_filter <- mol_data_filter %>%
+  pivot_longer(cols = starts_with("marker"), names_to = "marker", values_to = "count") %>%
+  mutate(percentage = round((count / 57) * 100, 0))
+
+techs_br <- mol_data_filter %>%
+  filter(geo_distribution == "Brazil")
+
+techs_wr <- mol_data_filter %>%
+  filter(geo_distribution == "Wide range")
+
+# Create donut plots
+techs_br_plot <- ggplot(techs_br, aes(x = 2, y = percentage, fill = marker)) +
+  geom_bar(stat = "identity") +
+  geom_text(aes(label = paste0("", count)),
+    position = position_stack(vjust = 0.5),
+    size = 3
+  ) +
+  coord_polar("y", start = 0) +
+  xlim(.2, 2.5) +
+  theme_void() +
+  theme(
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(),
+    axis.line = element_blank(),
+    axis.ticks = element_blank(),
+    axis.title = element_blank(),
+    axis.text = element_blank(),
+    legend.position = "none",
+    plot.margin = margin(0, -1.5, 0, -1.5, "cm")
+  )
+
+techs_wr_plot <- ggplot(techs_wr, aes(x = 2, y = percentage, fill = marker)) +
+  geom_bar(stat = "identity") +
+  geom_text(aes(label = paste0("", count)),
+    position = position_stack(vjust = 0.5),
+    size = 3
+  ) +
+  coord_polar("y", start = 0) +
+  xlim(.2, 2.5) +
+  theme_void() +
+  theme(
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(),
+    axis.line = element_blank(),
+    axis.ticks = element_blank(),
+    axis.title = element_blank(),
+    axis.text = element_blank(),
+    legend.position = "none",
+    plot.margin = margin(0, -1.5, 0, -1.5, "cm")
+  )
+
+techs_br_wr <- ggarrange(techs_br_plot, techs_wr_plot,
+  nrow = 2
+)
+```
+
+```{r fig3 lollipop plot, echo=TRUE}
+# Lollipop plot
+
+## Extract distribution data
+distrib_data <- mol_data %>%
+  slice(-c(46, 49, 51, 64)) %>%
+  group_by(geo_distribution) %>%
+  summarise(distribution = n())
+
+## Edit dataframe change text
+distrib_data <- distrib_data %>%
+  mutate(
+    geo_distribution = str_replace(geo_distribution, "endemic", "Brazil"),
+    geo_distribution = str_replace(geo_distribution, "wide-range", "Wide range")
+  ) %>%
+  slice(-1) # remove Latin America
+
+# Lollipop plot
+distrib_plot <- ggplot(distrib_data, aes(geo_distribution, distribution)) +
+  geom_point() +
+  geom_segment(aes(geo_distribution, xend = geo_distribution, y = 0, yend = distribution)) +
+  scale_y_continuous(
+    limits = c(0, 50),
+    breaks = seq(0, 50, 10),
+    expand = c(0, 0)
+  ) +
+  labs(x = "\nGeographic Distribution", y = "Number of Species\n") +
+  theme_minimal() +
+  theme(
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(),
+    axis.line = element_line(color = "black"),
+    axis.ticks = element_line(color = "black"),
+    axis.title = element_text(face = "bold", size = 18, family = "Times New Roman"),
+    axis.text = element_text(size = 16, family = "Times New Roman", color = "black"),
+    legend.title = element_text(face = "bold", size = 14, family = "Times New Roman"),
+    legend.text = element_text(size = 14, family = "Times New Roman"),
+    legend.position = "bottom",
+    legend.justification = "center"
+  )
+```
+
+The final composition of Figure 3 is then drawn:
+
+```{r fig3 final composition, echo=TRUE, warning=FALSE, fig.width=15, fig.height=7}
+tech_markers_comp <- ggarrange(tech_types_plot,
+  nrow = 3, labels = "A",
+  NULL,
+  ggarrange(markers_plot, techs_br_wr, distrib_plot,
+    ncol = 3,
+    labels = c("B", "C", "D"),
+    widths = c(3.5, 0.75, 1.5),
+    vjust = -0.75,
+    font.label = list(
+      size = 18,
+      family = "Times New Roman"
+    )
+  ),
+  font.label = list(size = 18, family = "Times New Roman"),
+  heights = c(1, 0.20, 1)
+)
+
+plot(tech_markers_comp)
+```
+
+# Figure 4
+
+Genera found in the retrieved papers were analysed based on their frequency by
+1) the number of papers they appear and 2) the number of total samples from all
+papers. The special character "\*" was used to represent genera that did not
+contain endangered species.
+
+```{r fig4 plots, echo=TRUE, warning=FALSE, fig.width=15, fig.height=7}
+# Count genus by samples and papers
+sample_genus <- clean_data %>%
+  group_by(genus) %>%
+  summarise(s_count = n()) %>%
+  arrange(desc(s_count)) %>%
+  drop_na()
+
+paper_genus <- clean_data %>%
+  group_by(genus) %>%
+  summarise(p_count = n_distinct(paper)) %>%
+  arrange(desc(p_count)) %>%
+  drop_na()
+
+s_genus_plot <- sample_genus %>%
+  ggplot(aes(reorder(genus, s_count), s_count)) +
+  geom_bar(stat = "identity", aes(fill = classification)) +
+  geom_text(aes(label = s_count),
+    hjust = -0.2,
+    size = 4,
+    family = "Times New Roman",
+    fontface = "bold"
+  ) +
+  geom_text(aes(label = ifelse(genus %in% not_endang, "*", "")),
+    vjust = "center",
+    hjust = -4,
+    nudge_x = -0.15,
+    size = 4,
+    family = "Times New Roman",
+    fontface = "bold"
+  ) +
+  scale_fill_discrete(type = pal_pink) +
+  scale_y_continuous(
+    limits = c(0, 1000),
+    breaks = seq(0, 1000, by = 200),
+    expand = c(0, 0)
+  ) +
+  coord_flip() +
+  labs(x = "\nGenus", y = "\nSample Count") +
+  theme_minimal() +
+  theme(
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(),
+    legend.position = "none",
+    axis.line = element_line(color = "black"),
+    axis.ticks = element_line(color = "black"),
+    axis.title = element_text(face = "bold", size = 18),
+    axis.text.x = element_text(size = 12, color = "black"),
+    axis.text.y = element_text(size = 12, color = "black", face = "italic"),
+    text = element_text(family = "Times New Roman"),
+    plot.margin = margin(0.5, 0.5, 0.5, 0.5, "cm")
+  )
+
+
+p_genus_plot <- paper_genus %>%
+  ggplot(aes(reorder(genus, p_count), p_count)) +
+  geom_bar(stat = "identity", aes(fill = classification)) +
+  geom_text(aes(label = p_count),
+    hjust = -0.2,
+    size = 4,
+    family = "Times New Roman",
+    fontface = "bold"
+  ) +
+  geom_text(aes(label = ifelse(genus %in% not_endang, "*", "")),
+    vjust = "center",
+    hjust = -4,
+    nudge_x = -0.15,
+    size = 4,
+    family = "Times New Roman",
+    fontface = "bold"
+  ) +
+  scale_fill_discrete(type = pal_pink) +
+  scale_y_continuous(
+    limits = c(0, 20),
+    breaks = seq(0, 20, by = 4),
+    expand = c(0, 0)
+  ) +
+  coord_flip() +
+  labs(x = NULL, y = "\nPaper Count") +
+  theme_minimal() +
+  theme(
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(),
+    legend.position = "none",
+    axis.line = element_line(color = "black"),
+    axis.ticks = element_line(color = "black"),
+    axis.title = element_text(face = "bold", size = 18),
+    axis.text.x = element_text(size = 12, color = "black"),
+    axis.text.y = element_text(size = 12, color = "black", face = "italic"),
+    text = element_text(family = "Times New Roman"),
+    plot.margin = margin(0.5, 0.5, 0.5, 0.5, "cm")
+  )
+```
+
+# Figure 5
+
+To map how IUCN statuses changed over the years, a jitter plot was created. Two
+mais plots were created: the first one represents species that changed two
+statuses since 2009; the second one represents species that were previously
+classified as data deficient and gained another classification through the
+years.
+
+```{r fig5 vectors, echo=TRUE}
+# Load dataset
+iucn_data <- read.csv("../data/Metadata-EvolutionConservationStatus - definitiva (edit).csv")
+
+# Define species vector names
+st_chg_names <- c(
+  "Aetobatus narinari", " + Carcharhinus acronotus", "* Fontitrygon geijskesi",
+  "* Pseudobatos percellens", " + Rhizoprionodon porosus",
+  "Sphyrna tiburo", "Sphyrna tudes"
+)
+
+dd_st_names <- c(
+  "+ Carcharhimus porosus", "* Dasyatis hypostigma", "Ginglymostoma cirratum",
+  "Gymnura altavela", "Hypanus americanus", "Hypanus dipterurus",
+  "+ Hypanus guttatus", "Myliobatis freminvillei", "Myliobatis goodei",
+  "* Narcine brasiliensis", "* Paratrygon aiereba", "* Potamotrygon motoro",
+  "Rhinoptera bonasus", "+ Rhizoprionodon lalandii", "Rhizoprionodon terraenovae",
+  "Squalus cubensis", "Squalus mitsukurii"
+)
+```
+
+```{r fig5 bad status species, echo=TRUE}
+# Define vector with species names
+bad_status_spp <- c(
+  "Aetobatus narinari", "Carcharhinus acronotus", "Fontitrygon geijskesi",
+  "Pseudobatos percellens", "Rhizoprionodon porosus", "Sphyrna tiburo",
+  "Sphyrna tudes"
+)
+
+# Filter data
+bad_status_data <- iucn_data[iucn_data$species %in% bad_status_spp, ]
+```
+
+```{r fig5 new status species, echo=TRUE}
+# Define vector with species names
+new_stats_spp <- c(
+  "Carcharhimus porosus", "Dasyatis hypostigma", "Ginglymostoma cirratum",
+  "Gymnura altavela", "Hypanus americanus", "Hypanus dipterurus",
+  "Hypanus guttatus", "Myliobatis freminvillei", "Myliobatis goodei",
+  "Narcine brasiliensis", "Paratrygon aiereba", "Potamotrygon motoro",
+  "Rhinoptera bonasus", "Rhizoprionodon lalandii", "Rhizoprionodon terraenovae",
+  "Squalus cubensis", "Squalus mitsukurii"
+)
+
+# Filter data
+new_stats_data <- iucn_data[iucn_data$species %in% new_stats_spp, ]
+```
+
+The jitter plot was constructed based on the `geom_jitter`, with each dot
+painted with the color that represents a IUCN status, based on the IUCN color
+palette.
+
+```{r fig5 plots, echo=TRUE, warning=FALSE, fig.width=15, fig.height=7}
+# Create plots
+status_change_plot <- ggplot(bad_status_data, aes(species, year, color = iucn_global)) +
+  geom_jitter(width = -30, height = -15, aes(shape = class), size = 3) +
+  guides(shape = "none") +
+  scale_y_continuous(
+    limits = c(2009, 2022),
+    breaks = seq(2009, 2022, 1),
+    expand = c(0, 0)
+  ) +
+  scale_x_discrete(
+    guide = guide_axis(angle = 90),
+    labels = st_chg_names
+  ) +
+  scale_color_discrete(
+    type = pal_st_chg,
+    breaks = c("CR", "EN", "VU", "NT", "LC", "DD", "NE")
+  ) +
+  guides(color = guide_legend(nrow = 1)) +
+  scale_shape_manual(values = c(19, 17)) +
+  coord_cartesian(clip = "off") +
+  labs(x = NULL, y = "Publication Date\n", color = "IUCN Class") +
+  theme_minimal() +
+  theme(
+    panel.grid.major = element_line(),
+    panel.grid.minor = element_blank(),
+    axis.line = element_line(color = "black"),
+    axis.ticks = element_line(color = "black"),
+    axis.text.x = element_text(
+      face = "italic", family = "Times New Roman",
+      size = 16, color = "black"
+    ),
+    axis.text.y = element_text(family = "Times New Roman", size = 16, color = "black"),
+    axis.title.y = element_text(face = "bold", family = "Times New Roman", size = 18),
+    legend.text = element_text(family = "Times New Roman", size = 14, color = "black"),
+    legend.title = element_text(face = "bold", family = "Times New Roman", size = 14),
+    legend.justification = "center",
+    legend.position = "bottom",
+    plot.margin = unit(c(0.5, 0, 0, 0.25), "cm")
+  )
+
+dd_status_plot <- ggplot(new_stats_data, aes(species, year, color = iucn_global)) +
+  geom_jitter(width = -30, height = -15, aes(shape = class), size = 3) +
+  guides(shape = "none") +
+  scale_y_continuous(
+    limits = c(2009, 2022),
+    breaks = seq(2009, 2022, 1),
+    expand = c(0, 0)
+  ) +
+  scale_x_discrete(
+    guide = guide_axis(angle = 90),
+    labels = dd_st_names
+  ) +
+  scale_color_discrete(
+    type = pal_st_dd,
+    breaks = c("CR", "EN", "VU", "NT", "LC", "DD", "NE")
+  ) +
+  guides(color = guide_legend(nrow = 1)) +
+  scale_shape_manual(values = c(19, 17)) +
+  coord_cartesian(clip = "off") +
+  labs(x = NULL, y = NULL, color = "IUCN Class") +
+  theme_minimal() +
+  theme(
+    panel.grid.major = element_line(),
+    panel.grid.minor = element_blank(),
+    axis.line = element_line(color = "black"),
+    axis.ticks = element_line(color = "black"),
+    axis.text.x = element_text(
+      face = "italic", family = "Times New Roman",
+      size = 16, color = "black"
+    ),
+    # axis.text.y = element_text(family = "Times New Roman", size = 9),
+    axis.text.y = element_blank(),
+    axis.title.y = element_text(face = "bold", family = "Times New Roman", size = 16),
+    legend.text = element_text(family = "Times New Roman", size = 14, color = "black"),
+    legend.title = element_text(face = "bold", family = "Times New Roman", size = 14),
+    legend.justification = "center",
+    legend.position = "bottom",
+    plot.margin = unit(c(0.5, 0, 0, 0.25), "cm")
+  )
+
+iucn_comp_plot <- ggarrange(status_change_plot, dd_status_plot,
+  labels = c("A", "B"), ncol = 2,
+  heights = c(1, 1), align = "hv", font.label = list(size = 14, family = "Times New Roman")
+)
+
+plot(iucn_comp_plot)
+```
+
+# Figure 6
+
+In Figure 6 data is pulled from the dataset `SupportingInformation03`. It
+contains data regarding...
+
+```{r fig6 data, echo=TRUE}
+# Load dataset
+threat_data <- as_tibble(readxl::read_xlsx(
+  "../data/SupportingInformation03.xlsx",
+  skip = 1
+) %>%
+  filter(!row_number() %in% 1))
+```
+
+We included status abbreviations based on the IUCN classification and separated
+each assessment, creating the dataframes `threat_data_iucn` and
+`threat_data_br`.
+
+```{r fig6 data operations, echo=TRUE}
+# Abbreviate threat status
+threat_data <- threat_data %>%
+  mutate(across(everything(), ~ replace(., . == "Critically Endangered", "CR"))) %>%
+  mutate(across(everything(), ~ replace(., . == "Data Deficient", "DD"))) %>%
+  mutate(across(everything(), ~ replace(., . == "Endangered", "EN"))) %>%
+  mutate(across(everything(), ~ replace(., . == "Endangered/Least Concern", "EN/LC"))) %>%
+  mutate(across(everything(), ~ replace(., . == "Least Concern", "LC"))) %>%
+  mutate(across(everything(), ~ replace(., . == "Near Threatened", "NT"))) %>%
+  mutate(across(everything(), ~ replace(., . == "Vulnerable", "VU"))) %>%
+  mutate(across(everything(), ~ replace(., . == "na", NA)))
+
+# Create new dataframes
+iucn_global <- threat_data %>%
+  count(`IUCN - Global`) %>%
+  rename(
+    status = `IUCN - Global`,
+    total = n
+  ) %>%
+  mutate(origin = "IUCN Global")
+
+iucn_sa <- threat_data %>%
+  count(`IUCN - Southwest Atlantic`) %>%
+  rename(
+    status = `IUCN - Southwest Atlantic`,
+    total = n
+  ) %>%
+  mutate(origin = "IUCN Southwest Atlantic")
+
+br_redbook <- threat_data %>%
+  count(`Brazil - RedBook`) %>%
+  rename(
+    status = `Brazil - RedBook`,
+    total = n
+  ) %>%
+  mutate(origin = "Brazil Red Book")
+
+br_2009 <- threat_data %>%
+  count(`Brazil - IN 05/2009`) %>%
+  rename(
+    status = `Brazil - IN 05/2009`,
+    total = n
+  ) %>%
+  mutate(origin = "Brazil IN 05/2009")
+
+br_2014 <- threat_data %>%
+  count(`Brazil -  MMA 445/2014`) %>%
+  rename(
+    status = `Brazil -  MMA 445/2014`,
+    total = n
+  ) %>%
+  mutate(origin = "Brazil MMA 445/2014")
+
+br_2023 <- threat_data %>%
+  count(`Brazil - MMA 354/2023`) %>%
+  rename(
+    status = `Brazil - MMA 354/2023`,
+    total = n
+  ) %>%
+  mutate(origin = "Brazil MMA 354/2023")
+
+br_salve <- threat_data %>%
+  count(`Brazil - SALVE System`) %>%
+  rename(
+    status = `Brazil - SALVE System`,
+    total = n
+  ) %>%
+  mutate(origin = "Brazil SALVE System")
+
+# Create status dataframes
+status_data <- rbind(iucn_global, br_redbook, br_2014, br_2023, br_salve)
+threat_data_iucn <- rbind(iucn_global, iucn_sa, br_redbook)
+threat_data_br <- rbind(br_2009, br_2014, br_2023, br_salve)
+```
+
+Minor factor level adjustments were performed to better reflect how the
+assessments were performed over the years.
+
+```{r fig6 data adjustments, echo=TRUE}
+# Adjust column levels
+threat_data_iucn$origin <- factor(threat_data_iucn$origin,
+  levels = c("Brazil Red Book", "IUCN Southwest Atlantic", "IUCN Global")
+)
+
+threat_data_iucn$status <- factor(threat_data_iucn$status,
+  levels = c("CR", "EN", "VU", "NT", "LC", "DD", "NA")
+)
+
+threat_data_br$origin <- factor(threat_data_br$origin,
+  levels = c(
+    "Brazil SALVE System", "Brazil MMA 354/2023",
+    "Brazil MMA 445/2014", "Brazil IN 05/2009"
+  )
+)
+
+threat_data_br$status <- factor(threat_data_br$status,
+  levels = c("CR", "EN", "VU", "NT", "LC", "DD", "Anexo I", "Anexo II", "NA")
+)
+```
+
+Finally, the plots are created and the final composition is achieved.
+
+```{r fig6 plots, echo=TRUE, warning=FALSE, fig.width=15, fig.height=7}
+threat_plot <- ggplot(threat_data_iucn, aes(origin, total, fill = status)) +
+  geom_bar(stat = "identity", position = position_fill(reverse = TRUE), width = 0.5) +
+  coord_flip() +
+  scale_y_continuous(labels = scales::label_percent()) +
+  scale_fill_manual(values = pal_threat, na.value = "#555555") +
+  labs(x = "", y = "Percentage", fill = "IUCN Red List Category") +
+  theme_minimal() +
+  theme(
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(),
+    axis.line = element_line(color = "black"),
+    axis.ticks = element_line(color = "black"),
+    axis.title = element_text(family = "Times New Roman", size = 18, face = "bold"),
+    axis.text.x = element_text(family = "Times New Roman", size = 16),
+    axis.text.y = element_text(family = "Times New Roman", size = 16),
+    legend.text = element_text(family = "Times New Roman", size = 14),
+    legend.title = element_text(face = "bold", family = "Times New Roman", size = 14),
+    aspect.ratio = 1 / 4
+  )
+
+br_threat_plot <- ggplot(threat_data_br, aes(origin, total, fill = status)) +
+  geom_bar(stat = "identity", position = position_fill(reverse = TRUE), width = 0.5) +
+  coord_flip() +
+  scale_y_continuous(labels = scales::label_percent()) +
+  scale_fill_manual(values = pal_br_threat, na.value = "#555555") +
+  labs(x = "", y = "Percentage", fill = "IUCN Red List Category") +
+  theme_minimal() +
+  theme(
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(),
+    axis.line = element_line(color = "black"),
+    axis.ticks = element_line(color = "black"),
+    axis.title = element_text(family = "Times New Roman", size = 18, face = "bold"),
+    axis.text.x = element_text(family = "Times New Roman", size = 16),
+    axis.text.y = element_text(family = "Times New Roman", size = 16),
+    legend.text = element_text(family = "Times New Roman", size = 14),
+    legend.title = element_text(face = "bold", family = "Times New Roman", size = 14),
+    aspect.ratio = 1 / 4
+  )
+
+# Final composition
+iucn_classification_comp <- ggarrange(threat_plot, br_threat_plot,
+  nrow = 2, labels = c("A", "B"),
+  font.label = list(
+    size = 18,
+    family = "Times New Roman"
+  )
+)
+plot(iucn_classification_comp)
+```
+
+# Closing Remarks
+
+All codes presented in this R Markdown file were written and revised throughout the development of the paper. We took special care to ensure code readability and reproducibility, structuring code in a linear, continuum process. We understand that packages and file locations may change and break the code. In this context, we urge the reader to carefully read the code and run it in a "line by line" fashion, ensuring that each part runs and its results can be directed further down the pipeline of all analysis.
