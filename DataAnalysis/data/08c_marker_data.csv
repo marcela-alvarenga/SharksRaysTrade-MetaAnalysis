@@ -1,0 +1,17 @@
+marker,species,percent,sp_count
+COI,shark,100,38
+COI,ray,100,27
+CytB,shark,76.3,29
+CytB,ray,63,17
+12S,shark,89.5,34
+12S,ray,51.9,14
+16S,shark,89.5,34
+16S,ray,55.6,15
+ND2,shark,89.5,34
+ND2,ray,66.7,18
+ITS2,shark,71.1,27
+ITS2,ray,14.8,4
+Mitogenome,shark,60.5,23
+Mitogenome,ray,44.4,12
+COI (BOLD),shark,100,38
+COI (BOLD),ray,92.6,25

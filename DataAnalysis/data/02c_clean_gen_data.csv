@@ -1,0 +1,69 @@
+species,genus,family,order,classification,geo_distribution,genbank_total,marker_coi,marker_cytb,marker_12s,marker_16s,marker_nadh2,marker_its2,marker_mitogenome,marker_bold_coi,geo_distribution_obs
+Aetobatus narinari,Aetobatus,Myliobatidae,Myliobatiformes,ray,wide-range,151,59,61,1,,2,28,,67,"Sul dos EUA, América Latina, Africa"
+Alopias superciliosus,Alopias,Alopiidae,Lamniformes,shark,wide-range,194,121,4,6,6,56,1,1,130,cosmopolita
+Atlantoraja castelnaui,Atlantoraja,Arhynchobatidae,Rajiformes,ray,endemic,63,57,3,1,1,1,,1,64,Endemic
+Atlantoraja cyclophora,Atlantoraja,Arhynchobatidae,Rajiformes,ray,endemic,9,8,,,,1,,,27,Endemic
+Bathytoshia centroura,Bathytoshia,Dasyatidae,Myliobatiformes,ray,endemic,24,17,2,2,2,1,,1,15,Endemic
+Benthobatis kreffti,Benthobatis,Narcinidae,Torpediniformes,ray,endemic,4,4,,,,,,,4,Endemic
+Carcharhinus acronotus,Carcharhinus,Carcharhinidae,Carcharhiniformes,shark,wide-range,78,59,3,7,7,1,1,1,59,"Sul dos EUA, América Latina"
+Carcharhinus altimus,Carcharhinus,Carcharhinidae,Carcharhiniformes,shark,wide-range,43,40,,1,1,1,,,57,cosmopolita
+Carcharhinus brachyurus,Carcharhinus,Carcharhinidae,Carcharhiniformes,shark,wide-range,28,22,2,1,1,1,1,1,27,todos os continentes mas nao chega a ser cosmopolita
+Carcharhinus brevipinna,Carcharhinus,Carcharhinidae,Carcharhiniformes,shark,wide-range,156,142,3,4,3,1,3,1,153,todos os continentes mas nao chega a ser cosmopolita
+Carcharhinus falciformis,Carcharhinus,Carcharhinidae,Carcharhiniformes,shark,wide-range,677,406,4,6,5,253,3,1,352,cosmopolita
+Carcharhinus galapagensis,Carcharhinus,Carcharhinidae,Carcharhiniformes,shark,wide-range,86,23,,,,63,,,23,todos os continentes mas nao chega a ser cosmopolita
+Carcharhinus leucas,Carcharhinus,Carcharhinidae,Carcharhiniformes,shark,wide-range,142,112,17,5,5,1,2,2,108,cosmopolita
+Carcharhinus limbatus,Carcharhinus,Carcharhinidae,Carcharhiniformes,shark,wide-range,122,106,3,6,4,1,2,,136,cosmopolita
+Carcharhinus obscurus,Carcharhinus,Carcharhinidae,Carcharhiniformes,shark,wide-range,131,45,3,3,2,76,2,1,92,cosmopolita
+Carcharhinus perezi,Carcharhinus,Carcharhinidae,Carcharhiniformes,shark,wide-range,38,22,1,6,6,3,,1,46,"Sul dos EUA, América Latina"
+Carcharhinus plumbeus,Carcharhinus,Carcharhinidae,Carcharhiniformes,shark,wide-range,95,77,3,6,5,2,2,1,128,todos os continentes mas nao chega a ser cosmopolita
+Carcharhinus porosus,Carcharhinus,Carcharhinidae,Carcharhiniformes,shark,wide-range,136,106,6,11,11,2,,,115,"Sul dos EUA, América Latina"
+Carcharhinus signatus,Carcharhinus,Carcharhinidae,Carcharhiniformes,shark,wide-range,17,14,,1,1,1,,,18,"Sul dos EUA, América Latina, Africa"
+Carcharias taurus,Carcharias,Odontaspididae,Lamniformes,shark,wide-range,112,90,7,5,5,2,3,4,111,todos os continentes mas nao chega a ser cosmopolita
+Carcharodon carcharias,Carcharodon,Alopiidae,Lamniformes,shark,wide-range,411,19,129,129,129,2,3,131,159,cosmopolita
+Centrophorus squamosus,Centrophorus,Centrophoridae,Squaliformes,shark,wide-range,69,43,,3,18,5,,,53,todos os continentes mas nao chega a ser cosmopolita
+Dasyatis hypostigma,Dasyatis,Dasyatidae,Myliobatiformes,ray,endemic,19,19,,,,,,,15,Endemic
+Fontitrygon geijskesi,Fontitrygon,Dasyatidae,Myliobatiformes,ray,endemic,4,4,,,,,,,,Endemic
+Galeocerdo cuvier,Galeocerdo,Carcharhinidae,Carcharhiniformes,shark,wide-range,304,265,21,5,6,4,3,4,272,cosmopolita
+Galeorhinus galeus,Galeorhinus,Triakidae,Carcharhiniformes,shark,wide-range,37,32,1,1,2,1,,,36,todos os continentes mas nao chega a ser cosmopolita
+Ginglymostoma cirratum,Ginglymostoma,Ginglymostomatidae,Orectolobiformes,shark,wide-range,10,2,2,2,2,1,1,1,12,"Sul dos EUA, América Latina, Africa"
+Gymnura altavela,Gymnura,Gymnuridae,Myliobatiformes,ray,wide-range,43,32,4,2,2,1,2,,72,"Sul dos EUA, América Latina, Africa, Europa"
+Gymnura micrura,Gymnura,Gymnuridae,Myliobatiformes,ray,Latin America,24,22,1,,,1,,,16,América Latina
+Hypanus americanus,Hypanus,Dasyatidae,Myliobatiformes,ray,wide-range,110,72,9,9,10,9,1,9,60,"Sul dos EUA, México, Venezuela "
+Hypanus berthalutzae,Hypanus,Dasyatidae,Myliobatiformes,ray,endemic,115,23,23,23,23,23,,23,,Endemic
+Hypanus dipterurus,Hypanus,Dasyatidae,Myliobatiformes,ray,Latin America,2,2,,,,,,,5,Endemic (Mexico Pacific + Peru)
+Hypanus guttatus,Hypanus,Dasyatidae,Myliobatiformes,ray,Latin America,123,119,1,1,1,1,,1,70,Endemic (Mexico Atlantic + Venezuela)
+Isogomphodon oxyrhynchus,Isogomphodon,Carcharhinidae,Carcharhiniformes,shark,endemic,17,2,,2,2,1,10,,2,Endemic
+Isurus oxyrinchus,Isurus,Alopiidae,Lamniformes,shark,wide-range,246,208,11,7,6,9,5,5,219,cosmopolita
+Isurus paucus,Isurus,Alopiidae,Lamniformes,shark,wide-range,61,49,1,4,4,2,1,1,54,cosmopolita
+Mobula thurstoni,Mobula,Myliobatidae,Myliobatiformes,ray,wide-range,63,44,4,1,1,13,,3,43,cosmopolita
+Mustelus canis,Mustelus,Triakidae,Carcharhiniformes,shark,wide-range,41,37,1,1,1,1,,1,35,"Sul dos EUA Atlantico, Sul da America do Sul, America Central Atlantico"
+Mustelus higmani,Mustelus,Triakidae,Carcharhiniformes,shark,Latin America,3,1,,1,1,,,,1,América Latina
+Myliobatis freminvillei,Myliobatis,Myliobatidae,Myliobatiformes,ray,wide-range,38,34,1,1,1,1,,1,30,EUA atlantico + America do Sul Atlantico
+Myliobatis goodei,Myliobatis,Myliobatidae,Myliobatiformes,ray,wide-range,15,15,,,,,,,16,"Sul dos EUA Atlantico, Sul da America do Sul, America Central Atlantico"
+Narcine brasiliensis,Narcine,Narcinidae,Torpediniformes,ray,endemic,21,14,2,1,1,1,2,1,16,Endemic
+Paratrygon aiereba,Paratrygon,Potamotrygonidae,Myliobatiformes,ray,endemic,143,74,69,,,,,,74,Endemic
+Potamotrygon motoro,Potamotrygon,Potamotrygonidae,Myliobatiformes,ray,endemic,186,107,75,2,1,1,,1,95,Endemic
+Prionace glauca,Prionace,Carcharhinidae,Carcharhiniformes,shark,wide-range,1095,858,102,8,11,111,5,2,745,cosmopolita
+Pristis perotteti,old name for "Pristis pristis",,,,,24,,1,,,1,,,,
+Pristis pristis,Pristis,Pristidae,Rhinopristiformes,ray,wide-range,,17,2,1,1,1,,1,27,todos os continentes mas nao chega a ser cosmopolita
+Pseudobatos horkelii,Pseudobatos,Rhinobatidae,Rhinopristiformes,ray,endemic,54,24,,,1,,,,10,Endemic
+Rhinobatos horkelii,old name for "Pseudobatos horkelii",,,,,,28,,,1,,,,,
+Pseudobatos percellens,Pseudobatos,Rhinobatidae,Rhinopristiformes,ray,endemic,57,41,,,,,,,7,Endemic
+Rhinobatos percellens,old name for "Pseudobatos percellens",,,,,,15,,,1,,,,,
+Rhinoptera bonasus,Rhinoptera,Myliobatidae,Myliobatiformes,ray,wide-range,51,45,2,1,1,2,,1,43,"Sul dos EUA Atlantico, Sul da America do Sul, America Central Atlantico"
+Rhinoptera brasiliensis,Rhinoptera,Myliobatidae,Myliobatiformes,ray,wide-range,57,52,1,1,1,1,,1,51,"Sul dos EUA Atlantico, Sul da America do Sul, America Central Atlantico"
+Rhizoprionodon lalandii,Rhizoprionodon,Carcharhinidae,Carcharhiniformes,shark,Latin America,69,65,,1,1,1,1,,60,América Latina
+Rhizoprionodon porosus,Rhizoprionodon,Carcharhinidae,Carcharhiniformes,shark,Latin America,177,166,5,1,1,1,3,,68,América Latina
+Rhizoprionodon terraenovae,Rhizoprionodon,Carcharhinidae,Carcharhiniformes,shark,wide-range,6,4,,,,,2,,59,Endemic (atlantic mexico + sul dos eua)
+Rioraja agassizii,Rioraja,Arhynchobatidae,Rajiformes,ray,endemic,42,42,,,,1,,,44,Endemic
+Sphyrna lewini,Sphyrna,Carcharhinidae,Carcharhiniformes,shark,wide-range,748,600,4,6,8,121,9,1,607,cosmopolita
+Sphyrna mokarran,Sphyrna,Carcharhinidae,Carcharhiniformes,shark,wide-range,89,75,3,4,3,2,2,1,78,cosmopolita
+Sphyrna tiburo,Sphyrna,Carcharhinidae,Carcharhiniformes,shark,wide-range,85,67,2,6,6,2,2,1,66,"Sul dos EUA Atlantico, Sul da America do Sul, America Central Atlantico"
+Sphyrna tudes,Sphyrna,Carcharhinidae,Carcharhiniformes,shark,Latin America,33,20,2,4,4,1,2,,23,América Latina
+Sphyrna zygaena,Sphyrna,Carcharhinidae,Carcharhiniformes,shark,wide-range,224,140,4,5,4,67,4,4,161,cosmopolita
+Squalus cubensis,Squalus,Squalidae,Squaliformes,shark,wide-range,25,3,1,1,1,17,2,1,108,"Sul dos EUA Atlantico, Sul da America do Sul, America Central Atlantico"
+Squalus mitsukurii,Squalus,Squalidae,Squaliformes,shark,"não aplicável, excluir do gráfico C",62,23,1,4,3,31,,1,69,Endemic (Japão)
+Squatina guggenheim,Squatina,Squatinidae,Squatiniformes,shark,endemic,181,100,81,,,,78,,104,Endemic
+Squatina occulta,Squatina,Squatinidae,Squatiniformes,shark,endemic,8,8,,,,,,,8,Endemic
+Styracura schmardae,Styracura,Potamotrygonidae,Myliobatiformes,ray,endemic,6,2,3,,,1,,,2,Endemic
+Zapteryx brevirostris,Zapteryx,Rhinobatidae,Rhinopristiformes,ray,endemic,13,12,,,1,,,,11,Endemic

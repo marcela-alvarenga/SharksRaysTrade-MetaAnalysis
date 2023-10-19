@@ -1,0 +1,45 @@
+"genus","p_count","classification","no_endange_spp"
+"Carcharhinus",17,"Shark",NA
+"Sphyrna",17,"Shark",NA
+"Rhizoprionodon",15,"Shark",NA
+"Prionace",10,"Shark","*"
+"Hypanus",9,"Ray",NA
+"Pseudobatos",8,"Ray",NA
+"Galeocerdo",7,"Shark","*"
+"Gymnura",7,"Ray",NA
+"Squatina",7,"Shark",NA
+"Isurus",6,"Shark",NA
+"Aetobatus",5,"Ray",NA
+"Narcine",5,"Ray","*"
+"Rhinoptera",5,"Ray",NA
+"Ginglymostoma",4,"Shark",NA
+"Squalus",4,"Shark","*"
+"Atlantoraja",3,"Ray",NA
+"Dasyatis",3,"Ray",NA
+"Mustelus",3,"Shark",NA
+"Myliobatis",3,"Ray",NA
+"Pristis",3,"Ray",NA
+"Xiphias",3,"Bony Fish","*"
+"Zapteryx",3,"Ray",NA
+"Bathytoshia",2,"Ray",NA
+"Fontitrygon",2,"Ray",NA
+"Pangasianodon",2,"Bony Fish",NA
+"Rioraja",2,"Ray",NA
+"Alopias",1,"Shark",NA
+"Benthobatis",1,"Ray",NA
+"Carcharias",1,"Shark",NA
+"Carcharodon",1,"Shark",NA
+"Centrophorus",1,"Shark",NA
+"Cynoscion",1,"Bony Fish","*"
+"Gadus",1,"Bony Fish",NA
+"Galeorhinus",1,"Shark",NA
+"Genidens",1,"Bony Fish",NA
+"Isogomphodon",1,"Shark",NA
+"Lophius",1,"Bony Fish","*"
+"Makaira",1,"Bony Fish",NA
+"Merluccius",1,"Bony Fish",NA
+"Mobula",1,"Ray",NA
+"Paratrygon",1,"Ray",NA
+"Potamotrygon",1,"Ray",NA
+"Pteroplatytrygon",1,"Ray","*"
+"Styracura",1,"Ray",NA

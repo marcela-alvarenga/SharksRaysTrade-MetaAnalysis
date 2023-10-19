@@ -1,0 +1,17 @@
+"marker","species","percent"
+"marker_coi","shark",100
+"marker_coi","ray",100
+"marker_cytb","shark",76.3
+"marker_cytb","ray",63
+"marker_12s","shark",89.5
+"marker_12s","ray",51.9
+"marker_16s","shark",89.5
+"marker_16s","ray",55.6
+"marker_nadh2","shark",89.5
+"marker_nadh2","ray",66.7
+"marker_its2","shark",71.1
+"marker_its2","ray",14.8
+"marker_mitogenome","shark",60.5
+"marker_mitogenome","ray",44.4
+"marker_bold_coi","shark",100
+"marker_bold_coi","ray",92.6
